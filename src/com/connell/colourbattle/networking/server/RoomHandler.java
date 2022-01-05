@@ -1,39 +1,38 @@
 package com.connell.colourbattle.networking.server;
 
-import java.io.IOException;
 import java.net.Socket;
 import java.util.LinkedList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import com.connell.colourbattle.networking.Packet;
 
 public class RoomHandler {
 	private LinkedList<ClientHandler> clients;
+	private ExecutorService clientPool;
 	
 	private int maxClientCount;
 	
 	public RoomHandler(int maxClientCount) {
-		this.setClients(new LinkedList<ClientHandler>());
+		this.setMaxClientCount(maxClientCount);
 		
-		this.setMaxPlayerCount(maxClientCount);
+		this.setClients(new LinkedList<ClientHandler>());
+		this.setClientPool(Executors.newFixedThreadPool(this.getMaxClientCount()));
 	}
 	
 	public void acceptClient(Socket clientSocket) {
 		ClientHandler client = new ClientHandler(clientSocket, this);
 		this.getClients().add(client);
 		
-		client.sendData(new Packet("max_client_count", this.getClientPlayerCount() + ""));
+		clientPool.execute(client);
+
+		client.sendData(new Packet("max_client_count", this.getMaxClientCount() + ""));
 		this.sendDataToAll(new Packet("update_current_client_count", this.getClientCount() + ""));
 		
-		if (this.getClientCount() >= this.getClientPlayerCount()) {
-			this.sendDataToAll(new Packet("game_start"));
-		}
-		
 		System.out.println(this.getClientCount() + " Client(s) in Room");
-	}
-	
-	public void handleClientConnections() throws IOException {
-		for (ClientHandler client : this.getClients()) {
-			client.handleDataReceival();
+		
+		if (this.getClientCount() >= this.getMaxClientCount()) {
+			this.sendDataToAll(new Packet("game_start"));
 		}
 	}
 	
@@ -48,14 +47,14 @@ public class RoomHandler {
 		}
 	}
 	
-	public void stop() throws IOException {
+	public void stop() {
 		for (ClientHandler client : this.getClients()) {
 			client.stop();
 		}
 	}
 	
 	public boolean isFull() {
-		return (this.getClientCount() >= this.getClientPlayerCount());
+		return (this.getClientCount() >= this.getMaxClientCount());
 	}
 	
 	public int getClientCount() {
@@ -70,11 +69,19 @@ public class RoomHandler {
 		this.clients = clients;
 	}
 
-	public int getClientPlayerCount() {
+	public int getMaxClientCount() {
 		return maxClientCount;
 	}
 
-	public void setMaxPlayerCount(int maxPlayerCount) {
-		this.maxClientCount = maxPlayerCount;
+	public void setMaxClientCount(int maxClientCountCount) {
+		this.maxClientCount = maxClientCountCount;
 	}
+
+	public ExecutorService getClientPool() {
+		return clientPool;
+	}
+
+	public void setClientPool(ExecutorService clientPool) {
+		this.clientPool = clientPool;
+	}	
 }

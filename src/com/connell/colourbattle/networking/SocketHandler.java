@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.LinkedList;
 
-public abstract class SocketHandler {
+public abstract class SocketHandler implements Runnable {
 	private Socket clientSocket;
 	
 	private BufferedReader in;
@@ -45,8 +45,6 @@ public abstract class SocketHandler {
 				Packet message = Packet.decode(recvData);
 				
 				if (!message.getData().equals("")) {
-					this.sendData(new Packet());
-					
 					for (SocketEvent event : this.getSocketEvents()) {
 						if (message.getEvent().equals(event.getEvent())) {
 							event.call(message.getData());
@@ -57,8 +55,8 @@ public abstract class SocketHandler {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
 			System.out.println("Failed to Recieve Data");
+			this.stop();
 		}
 	}
 	

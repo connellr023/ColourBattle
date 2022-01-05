@@ -7,9 +7,10 @@ import com.connell.colourbattle.utilities.*;
 import processing.core.PConstants;
 
 public abstract class View {
-	public static void initViews() {
+	public static void registerViews() {
 		RenderingManager.addView(new Menu());
 		RenderingManager.addView(new WaitingRoom());
+		RenderingManager.addView(new Game());
 	}
 	
 	public static void loadViews() {

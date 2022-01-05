@@ -32,7 +32,7 @@ public class RenderingManager extends PApplet {
 	}
 	
 	public static void run(String[] pArgs) {
-		View.initViews();
+		View.registerViews();
 		PApplet.runSketch(pArgs, getRenderer());
 	}
 	

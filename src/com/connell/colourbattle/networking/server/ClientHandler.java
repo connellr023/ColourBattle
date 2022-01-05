@@ -17,6 +17,20 @@ public class ClientHandler extends SocketHandler {
 	}
 	
 	@Override
+	public void run() {
+		try {
+			while (true) {
+				this.handleDataReceival();
+			}
+		}
+		catch (Exception e) {
+			this.stop();
+			
+			e.printStackTrace();
+		}
+	}
+	
+	@Override
 	public void start() {
 		this.listen(new SocketEvent("console_message") {
 			@Override
@@ -31,9 +45,6 @@ public class ClientHandler extends SocketHandler {
 		try {			
 			this.getIn().close();
 			this.getOut().close();
-			
-			this.getClientSocket().close();
-			this.getParentRoom().getClients().remove(this);
 		}
 		catch (Exception e) {
 			System.out.println("Failed to Stop Client");

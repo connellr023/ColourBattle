@@ -26,8 +26,13 @@ public class Packet {
 	public static Packet decode(String message) {
 		String[] splitMessage = message.split("" + SPLIT_CHAR);
 
+		String event = splitMessage[0];
+		
 		if (splitMessage.length > 1) {			
-			return new Packet(splitMessage[0], splitMessage[1]);
+			return new Packet(event, splitMessage[1]);
+		}
+		else if (splitMessage.length == 1) {
+			return new Packet(event, splitMessage[0]);
 		}
 		
 		return new Packet();

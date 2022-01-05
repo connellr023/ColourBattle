@@ -24,42 +24,36 @@ public class ServerSocketStream implements Runnable {
 			
 			System.out.println("Started New Socket Server on Port: " + this.getServerSocket().getLocalPort());
 			
-			while (!this.getServerSocket().equals(null)) {
+			while (true) {
 				this.handleClientAcceptions();
 			}
-			
-			this.stop();
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	private void handleClientAcceptions() throws IOException {
-		int availableRoomCounter = 0;
-		
 		for (RoomHandler room : this.getRooms()) {
-			room.handleClientConnections();
-			
-			if (!room.isFull() && availableRoomCounter <= 0) {
+			if (!room.isFull()) {
 				room.acceptClient(this.getServerSocket().accept());
-				
-				availableRoomCounter++;
+				return;
 			}
 		}
 		
-		if (availableRoomCounter <= 0) {			
-			this.openNewRoomAndAcceptClient();
-			System.out.println(this.getRoomCount() + " Active Room(s) Currently");
-		}
+		this.openNewRoomAndAcceptClient();
 	}
 	
 	private void openNewRoomAndAcceptClient() throws IOException {
-		if (this.getRoomCount() < this.getMaxRoomCount()) {			
-			RoomHandler room = new RoomHandler(2);
+		if (this.getRoomCount() < this.getMaxRoomCount()) {
+			int maxClientCount = 2;
+			
+			RoomHandler room = new RoomHandler(maxClientCount);
 			this.getRooms().add(room);
 			
 			room.acceptClient(this.getServerSocket().accept());
+			
+			System.out.println(this.getRoomCount() + " Active Room(s) Currently");
 		}
 	}
 	

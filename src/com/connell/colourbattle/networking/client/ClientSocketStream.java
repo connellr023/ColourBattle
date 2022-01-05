@@ -4,10 +4,11 @@ import java.io.BufferedReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
+import com.connell.colourbattle.graphics.RenderingManager;
 import com.connell.colourbattle.networking.SocketEvent;
 import com.connell.colourbattle.networking.SocketHandler;
 
-public class ClientSocketStream extends SocketHandler implements Runnable {
+public class ClientSocketStream extends SocketHandler {
 	private BufferedReader in;
 	private PrintWriter out;
 	
@@ -56,6 +57,7 @@ public class ClientSocketStream extends SocketHandler implements Runnable {
 			@Override
 			public void call(String data) {
 				System.out.println("Game Starting");
+				RenderingManager.setActiveViewIndex(2);
 			}
 		});
 	}
@@ -74,8 +76,8 @@ public class ClientSocketStream extends SocketHandler implements Runnable {
 			}
 		}
 		catch (Exception e) {
-			this.setRunning(false);
 			e.printStackTrace();
+			this.setRunning(false);
 		}
 	}
 	
