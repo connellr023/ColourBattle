@@ -24,10 +24,15 @@ public class ClientHandler extends SocketHandler {
 			}
 		}
 		catch (Exception e) {
-			this.stop();
-			
-			e.printStackTrace();
+			this.handleDisconnect();
 		}
+	}
+	
+	@Override
+	public void handleDisconnect() {
+		this.getParentRoom().getClients().remove(this);
+		
+		System.out.println("Client Disconnected (" + this.getParentRoom().getClientCount() + " Clients in Room)");
 	}
 	
 	@Override

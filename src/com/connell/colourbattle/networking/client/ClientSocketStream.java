@@ -76,9 +76,15 @@ public class ClientSocketStream extends SocketHandler {
 			}
 		}
 		catch (Exception e) {
-			e.printStackTrace();
-			this.setRunning(false);
+			this.handleDisconnect();
 		}
+	}
+	
+	@Override
+	public void handleDisconnect() {
+		System.out.println("Disconnected From Server");
+		this.setRunning(false);
+		this.stop();
 	}
 	
 	@Override

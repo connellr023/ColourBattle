@@ -1,6 +1,7 @@
 package com.connell.colourbattle.networking;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
@@ -37,28 +38,24 @@ public abstract class SocketHandler implements Runnable {
 		}
 	}
 	
-	public void handleDataReceival() {
-		try {
-			String recvData;
+	public void handleDataReceival() throws IOException {
+		String recvData;
+		
+		if (!(recvData = this.getIn().readLine()).equals(null)) {
+			Packet message = Packet.decode(recvData);
 			
-			if (!(recvData = this.getIn().readLine()).equals(null)) {
-				Packet message = Packet.decode(recvData);
-				
-				if (!message.getData().equals("")) {
-					for (SocketEvent event : this.getSocketEvents()) {
-						if (message.getEvent().equals(event.getEvent())) {
-							event.call(message.getData());
-							break;
-						}
+			if (!message.getData().equals("")) {
+				for (SocketEvent event : this.getSocketEvents()) {
+					if (message.getEvent().equals(event.getEvent())) {
+						event.call(message.getData());
+						break;
 					}
 				}
 			}
 		}
-		catch (Exception e) {
-			System.out.println("Failed to Recieve Data");
-			this.stop();
-		}
 	}
+	
+	public abstract void handleDisconnect();
 	
 	public void sendData(Packet message) {
 		try {
