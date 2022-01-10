@@ -25,6 +25,10 @@ public class SocketServerManager {
 			System.out.println("Failed to Start Server on Port: " + port);
 		}
 	}
+	
+	public static void stopServer() {
+		getServer().stop();
+	}
 
 	public static ServerSocketStream getServer() {
 		return server;

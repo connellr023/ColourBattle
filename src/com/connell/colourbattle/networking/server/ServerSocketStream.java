@@ -24,7 +24,7 @@ public class ServerSocketStream implements Runnable {
 			
 			System.out.println("Started New Socket Server on Port: " + this.getServerSocket().getLocalPort());
 			
-			while (true) {
+			while (!this.getServerSocket().isClosed()) {
 				this.handleClientAcceptions();
 			}
 		}
@@ -33,15 +33,20 @@ public class ServerSocketStream implements Runnable {
 		}
 	}
 
-	private void handleClientAcceptions() throws IOException {
-		for (RoomHandler room : this.getRooms()) {
-			if (!room.isFull()) {
-				room.acceptClient(this.getServerSocket().accept());
-				return;
+	private void handleClientAcceptions() {
+		try {			
+			for (RoomHandler room : this.getRooms()) {
+				if (!room.isFull()) {
+					room.acceptClient(this.getServerSocket().accept());
+					return;
+				}
 			}
+			
+			this.openNewRoomAndAcceptClient();
 		}
-		
-		this.openNewRoomAndAcceptClient();
+		catch (Exception e) {
+			System.out.println("Failed to Accept Client");
+		}
 	}
 	
 	private void openNewRoomAndAcceptClient() throws IOException {
@@ -57,11 +62,19 @@ public class ServerSocketStream implements Runnable {
 		}
 	}
 	
-	public void stop() throws IOException {
-		this.getServerSocket().close();
-		
-		for (RoomHandler room : this.getRooms()) {
-			room.stop();
+	public void stop() {
+		try {			
+			for (RoomHandler room : this.getRooms()) {
+				room.stop();
+			}
+			
+			this.getServerSocket().close();
+			
+			System.out.println("Closed Socket Server");
+		}
+		catch (Exception e) {
+			System.out.println("Failed to Stop Socket Server");
+			e.printStackTrace();
 		}
 	}
 	

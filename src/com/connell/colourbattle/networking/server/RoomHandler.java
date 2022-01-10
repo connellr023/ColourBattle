@@ -47,10 +47,24 @@ public class RoomHandler {
 		}
 	}
 	
+	public void onClientDisconnect() {
+		int clientCount = this.getClientCount();
+		
+		if (clientCount <= 1) {
+			SocketServerManager.stopServer();
+		}
+	}
+	
 	public void stop() {
+		ServerSocketStream server = SocketServerManager.getServer();
+		
 		for (ClientHandler client : this.getClients()) {
 			client.stop();
 		}
+		
+		server.getRooms().remove(this);
+		
+		System.out.println("Closed Room (" + server.getRoomCount() + " Room(s) Active)");
 	}
 	
 	public boolean isFull() {

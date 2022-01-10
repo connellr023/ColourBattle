@@ -83,8 +83,11 @@ public class ClientSocketStream extends SocketHandler {
 	@Override
 	public void handleDisconnect() {
 		System.out.println("Disconnected From Server");
+		
 		this.setRunning(false);
 		this.stop();
+		
+		RenderingManager.setActiveViewIndex(0);
 	}
 	
 	@Override
@@ -94,6 +97,8 @@ public class ClientSocketStream extends SocketHandler {
 			this.getOut().close();
 			
 			this.getClientSocket().close();
+			
+			System.out.println("Closed Socket Client");
 		}
 		catch (Exception e) {
 			e.printStackTrace();

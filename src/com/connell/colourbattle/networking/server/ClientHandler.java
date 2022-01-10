@@ -30,9 +30,10 @@ public class ClientHandler extends SocketHandler {
 	
 	@Override
 	public void handleDisconnect() {
-		this.getParentRoom().getClients().remove(this);
+		RoomHandler room = this.getParentRoom();
 		
-		System.out.println("Client Disconnected (" + this.getParentRoom().getClientCount() + " Clients in Room)");
+		room.getClients().remove(this);
+		room.onClientDisconnect();
 	}
 	
 	@Override
@@ -48,8 +49,10 @@ public class ClientHandler extends SocketHandler {
 	@Override
 	public void stop() {
 		try {			
+			this.getClientSocket().close();
 			this.getIn().close();
-			this.getOut().close();
+			
+			System.out.println("Closed Client (" + this.getParentRoom().getClientCount() + " Client(s) Connected)");
 		}
 		catch (Exception e) {
 			System.out.println("Failed to Stop Client");

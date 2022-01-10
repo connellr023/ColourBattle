@@ -28,7 +28,7 @@ public class Menu extends View {
 		float scale = RenderingManager.getScale();
 		
 		this.mainTitle = createStandardText("COLOUR BATTLE", 80, new Colour(224, 11, 40), new Vector2(screenCenter.getX(), screenCenter.getY() - (5.5f * scale)));
-		this.joinTitle = createStandardText("Join Game <IP:PORT>", 40, new Colour(255, 255, 255), new Vector2(screenCenter.getX(), screenCenter.getY() - (2.5f * scale)));
+		this.joinTitle = createStandardText("Join Game <IP>:<PORT>", 40, new Colour(255, 255, 255), new Vector2(screenCenter.getX(), screenCenter.getY() - (2.5f * scale)));
 		this.hostTitle = createStandardText("Host Game <PORT>", 40, new Colour(255, 255, 255), new Vector2(screenCenter.getX(), screenCenter.getY() + (3.5f * scale)));
 		this.credit = createStandardText("© Connell Reffo", 32, new Colour(171, 171, 171), new Vector2(95, (screenSize.getY() * scale) - 25));
 		
