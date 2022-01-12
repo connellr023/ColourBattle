@@ -24,7 +24,7 @@ public abstract class SocketHandler implements Runnable {
 	public abstract void start();
 	public abstract void stop();
 	
-	protected void listen(SocketEvent event) {
+	public void listen(SocketEvent event) {
 		this.getSocketEvents().add(event);
 	}
 	

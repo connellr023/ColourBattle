@@ -15,9 +15,6 @@ public class ClientSocketStream extends SocketHandler {
 	private int port;
 	private String ip;
 	
-	private int currentServerClientsCount;
-	private int maxServerClientsCount;
-	
 	private boolean isRunning;
 	
 	public ClientSocketStream(String ip, int port) {
@@ -34,22 +31,6 @@ public class ClientSocketStream extends SocketHandler {
 			@Override
 			public void call(String data) {
 				System.out.println("Client Received: " + data);
-			}
-		});
-		
-		this.listen(new SocketEvent("max_client_count", this) {
-			@Override
-			public void call(String data) {
-				ClientSocketStream stream = (ClientSocketStream) this.getObject();
-				stream.setMaxServerClientsCount(Integer.parseInt(data));
-			}
-		});
-		
-		this.listen(new SocketEvent("update_current_client_count", this) {
-			@Override
-			public void call(String data) {
-				ClientSocketStream stream = (ClientSocketStream) this.getObject();
-				stream.setCurrentServerClientsCount(Integer.parseInt(data));
 			}
 		});
 		
@@ -136,22 +117,6 @@ public class ClientSocketStream extends SocketHandler {
 	
 	public void setIp(String ip) {
 		this.ip = ip;
-	}
-
-	public int getCurrentServerClientsCount() {
-		return currentServerClientsCount;
-	}
-
-	public void setCurrentServerClientsCount(int currentServerClients) {
-		this.currentServerClientsCount = currentServerClients;
-	}
-
-	public int getMaxServerClientsCount() {
-		return maxServerClientsCount;
-	}
-
-	public void setMaxServerClientsCount(int maxServerClients) {
-		this.maxServerClientsCount = maxServerClients;
 	}
 
 	public boolean isRunning() {

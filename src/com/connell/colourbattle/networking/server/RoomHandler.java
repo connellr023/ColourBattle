@@ -6,10 +6,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import com.connell.colourbattle.networking.Packet;
+import com.connell.colourbattle.networking.server.game.GameManager;
 
 public class RoomHandler {
 	private LinkedList<ClientHandler> clients;
 	private ExecutorService clientPool;
+	
+	private GameManager game;
+	private Thread gameThread;
 	
 	private int maxClientCount;
 	
@@ -33,6 +37,11 @@ public class RoomHandler {
 		
 		if (this.getClientCount() >= this.getMaxClientCount()) {
 			this.sendDataToAll(new Packet("game_start"));
+			
+			this.setGame(new GameManager(this, 5, 60));
+			this.setGameThread(new Thread(this.getGame()));
+			
+			this.getGameThread().start();
 		}
 	}
 	
@@ -57,6 +66,8 @@ public class RoomHandler {
 	
 	public void stop() {
 		ServerSocketStream server = SocketServerManager.getServer();
+		
+		this.getGame().setRunning(false);
 		
 		for (ClientHandler client : this.getClients()) {
 			client.stop();
@@ -97,5 +108,21 @@ public class RoomHandler {
 
 	public void setClientPool(ExecutorService clientPool) {
 		this.clientPool = clientPool;
+	}
+
+	public GameManager getGame() {
+		return game;
+	}
+
+	public void setGame(GameManager game) {
+		this.game = game;
+	}
+
+	public Thread getGameThread() {
+		return gameThread;
+	}
+
+	public void setGameThread(Thread gameThread) {
+		this.gameThread = gameThread;
 	}	
 }

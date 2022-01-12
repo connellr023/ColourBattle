@@ -1,5 +1,7 @@
 package com.connell.colourbattle.networking.client;
 
+import com.connell.colourbattle.graphics.view.View;
+
 public class SocketClientManager {
 
 	private static ClientSocketStream client;
@@ -21,6 +23,8 @@ public class SocketClientManager {
 		if (init(ip, port)) {
 			setClientThread(new Thread(getClient()));
 			getClientThread().start();
+			
+			View.loadEvents();
 		}
 	}
 
