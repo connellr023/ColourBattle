@@ -21,7 +21,7 @@ public class Menu extends View {
 	private CreateServerButton createButton;
 	
 	@Override
-	public void load() {
+	public void start() {
 		Vector2 screenSize = RenderingManager.getScreenSize();
 		Vector2 screenCenter = RenderingManager.getScreenCenter();
 		

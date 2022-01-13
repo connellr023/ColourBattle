@@ -21,7 +21,7 @@ public abstract class View {
 	
 	public static void loadViews() {
 		for (View v : RenderingManager.getViews()) {
-			v.load();
+			v.start();
 		}
 	}
 	
@@ -35,7 +35,7 @@ public abstract class View {
 		getEvents().add(event);
 	}
 	
-	public abstract void load();
+	public abstract void start();
 	public abstract void render();
 	
 	protected static Text createStandardText(String body, float scale, Colour colour, Vector2 screenPosition) {

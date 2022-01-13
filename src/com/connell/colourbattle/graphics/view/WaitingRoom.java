@@ -18,7 +18,7 @@ public class WaitingRoom extends View {
 	private int maxClientCount;
 
 	@Override
-	public void load() {
+	public void start() {
 		Vector2 screenCenter = RenderingManager.getScreenCenter();
 		float scale = RenderingManager.getScale();
 		

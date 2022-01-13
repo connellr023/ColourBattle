@@ -1,12 +1,12 @@
 package com.connell.colourbattle.networking.server.game;
 
-import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.connell.colourbattle.networking.Packet;
 import com.connell.colourbattle.networking.server.RoomHandler;
 
 public class GameManager implements Runnable {
-	private LinkedList<Player> players;
+	private ConcurrentLinkedQueue<ServerGameObject> gameObjects;
 	
 	private boolean isRunning;
 	
@@ -24,7 +24,7 @@ public class GameManager implements Runnable {
 		this.setTicksPerSecond(ticksPerSecond);
 		this.setTickCount(0);
 		
-		this.setPlayers(new LinkedList<Player>());
+		this.setGameObjects(new ConcurrentLinkedQueue<ServerGameObject>());
 	}
 	
 	@Override
@@ -32,6 +32,8 @@ public class GameManager implements Runnable {
 		this.setRunning(true);
 		
 		try {
+			this.loadGameObjects();
+			
 			while (this.isRunning()) {
 				this.update();			
 				Thread.sleep((1000 / ticksPerSecond));
@@ -44,8 +46,21 @@ public class GameManager implements Runnable {
 		}
 	}
 	
+	private void loadGameObjects() {
+		for (ServerGameObject object : this.getGameObjects()) {
+			object.start();
+		}
+	}
+	
 	private void update() {
+		this.updateGameObjects();
 		this.updateTimer();
+	}
+	
+	private void updateGameObjects() {
+		for (ServerGameObject object : this.getGameObjects()) {
+			object.update();
+		}
 	}
 	
 	private void updateTimer() {
@@ -102,11 +117,11 @@ public class GameManager implements Runnable {
 		this.timeLeft = timeLeft;
 	}
 
-	public LinkedList<Player> getPlayers() {
-		return players;
+	public ConcurrentLinkedQueue<ServerGameObject> getGameObjects() {
+		return gameObjects;
 	}
 
-	public void setPlayers(LinkedList<Player> players) {
-		this.players = players;
+	public void setGameObjects(ConcurrentLinkedQueue<ServerGameObject> gameObjects) {
+		this.gameObjects = gameObjects;
 	}
 }

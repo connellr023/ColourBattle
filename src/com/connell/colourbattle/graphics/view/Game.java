@@ -12,7 +12,7 @@ public class Game extends View {
 	private int timeLeft;
 	
 	@Override
-	public void load() {
+	public void start() {
 		Vector2 screenCenter = RenderingManager.getScreenCenter();
 		float scale = RenderingManager.getScale();
 		
