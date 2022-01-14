@@ -1,29 +1,20 @@
 package com.connell.colourbattle.networking.server.game;
 
-import java.util.UUID;
-
 import com.connell.colourbattle.networking.Packet;
 import com.connell.colourbattle.utilities.Colour;
+import com.connell.colourbattle.utilities.GameObject;
 import com.connell.colourbattle.utilities.Hitbox;
 import com.connell.colourbattle.utilities.Vector2;
 
-public abstract class ServerGameObject {
+public abstract class ServerGameObject extends GameObject {
+	private static char SPLIT_CHAR = '#';
+	
 	private GameManager parentGame;
 	
-	private Vector2 position;
-	private Hitbox hitbox;
-	private Colour colour;
-	
-	private String id;
-	
 	public ServerGameObject(GameManager parentGame) {
+		super(Vector2.ZERO, new Hitbox(new Vector2(0, 0), new Vector2(1, 1)), new Colour(255, 255, 255));
+		
 		this.setParentGame(parentGame);
-		
-		this.setPosition(Vector2.ZERO);
-		this.setHitbox(new Hitbox(new Vector2(0, 0), new Vector2(1, 1)));
-		this.setColour(new Colour(255, 255, 255));
-		
-		this.setId(UUID.randomUUID().toString());
 	}
 	
 	public abstract void start();
@@ -34,19 +25,29 @@ public abstract class ServerGameObject {
 	}
 	
 	protected void broadcastSelf() {
-		
+		this.broadcast(new Packet("new_object", this.encode()));
 	}
 	
 	protected void broadcastPosition() {
-		this.broadcast(new Packet(this.getId() + "_update_position", position.toString()));
+		this.broadcast(new Packet(this.getId() + "_update_position", this.getPosition().toString()));
 	}
-
-	public Vector2 getPosition() {
-		return position;
+	
+	public static GameObject decode(String str) {
+		String[] split = str.split(SPLIT_CHAR + "");
+		
+		String id = split[0];
+		Colour colour = Colour.parse(split[1]);
+		Hitbox hitbox = Hitbox.parse(split[2]);
+		Vector2 position = Vector2.parse(split[3]);
+		
+		GameObject o = new GameObject(position, hitbox, colour);
+		o.setId(id);
+		
+		return o;
 	}
-
-	public void setPosition(Vector2 position) {
-		this.position = position;
+	
+	public String encode() {
+		return (this.getId() + SPLIT_CHAR + this.getColour().toString() + SPLIT_CHAR + this.getHitbox().toString() + SPLIT_CHAR + this.getPosition().toString());
 	}
 
 	public GameManager getParentGame() {
@@ -55,29 +56,5 @@ public abstract class ServerGameObject {
 
 	public void setParentGame(GameManager parentGame) {
 		this.parentGame = parentGame;
-	}
-
-	public String getId() {
-		return id;
-	}
-
-	public void setId(String id) {
-		this.id = id;
-	}
-
-	public Colour getColour() {
-		return colour;
-	}
-
-	public void setColour(Colour colour) {
-		this.colour = colour;
-	}
-
-	public Hitbox getHitbox() {
-		return hitbox;
-	}
-
-	public void setHitbox(Hitbox hitbox) {
-		this.hitbox = hitbox;
 	}
 }

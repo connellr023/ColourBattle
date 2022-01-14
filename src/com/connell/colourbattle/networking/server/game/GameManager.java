@@ -4,6 +4,8 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.connell.colourbattle.networking.Packet;
 import com.connell.colourbattle.networking.server.RoomHandler;
+import com.connell.colourbattle.utilities.Hitbox;
+import com.connell.colourbattle.utilities.Vector2;
 
 public class GameManager implements Runnable {
 	private ConcurrentLinkedQueue<ServerGameObject> gameObjects;
@@ -32,6 +34,7 @@ public class GameManager implements Runnable {
 		this.setRunning(true);
 		
 		try {
+			this.start();
 			this.loadGameObjects();
 			
 			while (this.isRunning()) {
@@ -50,6 +53,14 @@ public class GameManager implements Runnable {
 		for (ServerGameObject object : this.getGameObjects()) {
 			object.start();
 		}
+	}
+
+	private void start() {
+		Platform floor = new Platform(this, new Vector2(20, 20), new Hitbox(new Vector2(0, 0), new Vector2(5, 5)));
+		
+//		for (int i = 0; i < this.getParentRoom().getClientCount(); i++) {
+//			this.getGameObjects().add(new Player());
+//		}
 	}
 	
 	private void update() {

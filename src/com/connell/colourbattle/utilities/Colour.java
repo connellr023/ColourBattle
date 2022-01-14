@@ -1,6 +1,7 @@
 package com.connell.colourbattle.utilities;
 
 public class Colour {
+	private static char SPLIT_CHAR = ',';
 	
 	public static final Colour EMPTY = null;
 
@@ -20,4 +21,18 @@ public class Colour {
 		this.b = k;
 	}
 	
+	public static Colour parse(String str) {
+		String[] split = str.split(SPLIT_CHAR + "");
+
+		int r = Integer.parseInt(split[0]);
+		int g = Integer.parseInt(split[1]);
+		int b = Integer.parseInt(split[2]);
+		
+		return new Colour(r, g, b);
+	}
+	
+	@Override
+	public String toString() {
+		return (this.r + "" + SPLIT_CHAR + this.g + SPLIT_CHAR + this.b);
+	}
 }

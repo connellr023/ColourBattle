@@ -5,8 +5,9 @@ import com.connell.colourbattle.utilities.Vector2;
 public class Player extends ServerGameObject {
 
 	public Player(GameManager parentGame, Vector2 startPosition) {
-		super(parentGame, startPosition);
-		// TODO Auto-generated constructor stub
+		super(parentGame);
+		
+		this.setPosition(startPosition);
 	}
 
 	@Override
