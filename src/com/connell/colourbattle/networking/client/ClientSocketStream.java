@@ -51,9 +51,10 @@ public class ClientSocketStream extends SocketHandler {
 			
 			System.out.println("Connected to Server on: " + this.getIp() + ":" + this.getPort());
 			
-			while (true) {
+			this.setRunning(true);
+			
+			while (this.isRunning()) {
 				this.handleDataReceival();
-				this.setRunning(true);
 			}
 		}
 		catch (Exception e) {
@@ -65,8 +66,7 @@ public class ClientSocketStream extends SocketHandler {
 	public void handleDisconnect() {
 		System.out.println("Disconnected From Server");
 		
-		this.setRunning(false);
-		this.stop();
+		SocketClientManager.stopClient();
 		
 		RenderingManager.setActiveViewIndex(0);
 	}
@@ -74,6 +74,8 @@ public class ClientSocketStream extends SocketHandler {
 	@Override
 	public void stop() {
 		try {			
+			this.setRunning(false);
+			
 			this.getIn().close();
 			this.getOut().close();
 			

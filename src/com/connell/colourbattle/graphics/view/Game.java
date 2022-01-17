@@ -23,7 +23,7 @@ public class Game extends View {
 		Vector2 screenCenter = RenderingManager.getScreenCenter();
 		float scale = RenderingManager.getScale();
 		
-		this.timerText = createStandardText("", 35, new Colour(50, 255, 50), new Vector2(screenCenter.getX(), 1.2f * scale));
+		this.timerText = createStandardText("", 38, new Colour(33, 255, 55), new Vector2(screenCenter.getX(), 1.2f * scale));
 		
 		addClientSocketEvent(new SocketEvent("update_timer", this) {
 			@Override
@@ -48,12 +48,12 @@ public class Game extends View {
 
 	@Override
 	public void render() {
-		this.timerText.setBody("Time Left: " + this.getTimeLeft());
-		this.timerText.render();
-		
 		for (ClientGameObject object : this.getGameObjects().values()) {
 			object.render();
 		}
+		
+		this.timerText.setBody("Time Left: " + this.getTimeLeft());
+		this.timerText.render();
 	}
 
 	public int getTimeLeft() {

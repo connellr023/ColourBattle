@@ -4,13 +4,18 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
 import com.connell.colourbattle.networking.Packet;
+import com.connell.colourbattle.networking.server.ClientHandler;
 import com.connell.colourbattle.networking.server.RoomHandler;
+import com.connell.colourbattle.utilities.Colour;
 import com.connell.colourbattle.utilities.Constants;
 import com.connell.colourbattle.utilities.Hitbox;
 import com.connell.colourbattle.utilities.Vector2;
 
 public class GameManager implements Runnable {
 	private ConcurrentLinkedQueue<ServerGameObject> gameObjects;
+	private ConcurrentLinkedQueue<Platform> level;
+	private ConcurrentLinkedQueue<Player> players;
+	
 	private Vector2 gameSize;
 	
 	private boolean isRunning;
@@ -31,6 +36,8 @@ public class GameManager implements Runnable {
 		this.setTickCount(0);
 		
 		this.setGameObjects(new ConcurrentLinkedQueue<ServerGameObject>());
+		this.setLevel(new ConcurrentLinkedQueue<Platform>());
+		this.setPlayers(new ConcurrentLinkedQueue<Player>());
 	}
 	
 	@Override
@@ -47,10 +54,19 @@ public class GameManager implements Runnable {
 				
 				this.setTickCount(this.getTickCount() + 1);
 			}
-		} catch (InterruptedException e) {
+		}
+		catch (InterruptedException e) {
 			this.setRunning(false);
 			e.printStackTrace();
 		}
+	}
+	
+	public void stop() {
+		this.setRunning(false);
+		
+		this.getGameObjects().clear();
+		this.getLevel().clear();
+		this.getPlayers().clear();
 	}
 	
 	private void loadGameObjects() {
@@ -67,14 +83,22 @@ public class GameManager implements Runnable {
 		ConcurrentLinkedQueue<ServerGameObject> gameObjects = this.getGameObjects();
 		Vector2 gameSize = this.getGameSize();
 		
-		Platform floor = new Platform(this, new Vector2(gameSize.getX() / 2, gameSize.getY()), new Hitbox(new Vector2(0, 0), new Vector2(gameSize.getX(), 2)));
+		Platform floor = new Platform(this, new Vector2(gameSize.getX() / 2, gameSize.getY()), new Hitbox(new Vector2(0, 0), new Vector2(gameSize.getX(), 2)), 0.9f);
 		gameObjects.add(floor);
 		
 		int count = ThreadLocalRandom.current().nextInt(minPlatforms, maxPlatforms + 1);
 		
 		for (int i = 0; i < count; i++) {
-			Platform p = Platform.random();
-			gameObjects.add(p);
+			Platform p = Platform.random(this, 4, 8, 3, 7, 0.85f);
+			
+			if (!p.doesIntersect()) {				
+				this.addPlatform(p);
+			}
+		}
+		
+		for (ClientHandler client : this.getParentRoom().getClients()) {
+			System.out.println("test");
+			this.addPlayer(new Player(this, client, new Colour(255, 0, 240)));
 		}
 	}
 	
@@ -101,6 +125,16 @@ public class GameManager implements Runnable {
 			room.sendDataToAll(new Packet("update_timer", this.getTimeLeft() + ""));
 			this.setTimeLeft(this.getTimeLeft() - 1);
 		}
+	}
+	
+	private void addPlatform(Platform platform) {
+		this.getGameObjects().add(platform);
+		this.getLevel().add(platform);
+	}
+	
+	private void addPlayer(Player player) {
+		this.getGameObjects().add(player);
+		this.getPlayers().add(player);
 	}
 
 	public boolean isRunning() {
@@ -157,5 +191,21 @@ public class GameManager implements Runnable {
 
 	public void setGameSize(Vector2 gameSize) {
 		this.gameSize = gameSize;
+	}
+
+	public ConcurrentLinkedQueue<Platform> getLevel() {
+		return level;
+	}
+
+	public void setLevel(ConcurrentLinkedQueue<Platform> level) {
+		this.level = level;
+	}
+
+	public ConcurrentLinkedQueue<Player> getPlayers() {
+		return players;
+	}
+
+	public void setPlayers(ConcurrentLinkedQueue<Player> players) {
+		this.players = players;
 	}
 }

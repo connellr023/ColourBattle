@@ -6,6 +6,6 @@
 			<attribute name="module" value="true"/>
 		</attributes>
 	</classpathentry>
-	<classpathentry kind="lib" path="Q:/Programming/Eclipse Workspace/core.jar"/>
+	<classpathentry kind="lib" path="C:/Users/904144004/Desktop/Java/core.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

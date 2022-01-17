@@ -20,6 +20,10 @@ public abstract class ServerGameObject extends GameObject {
 	public abstract void start();
 	public abstract void update();
 	
+	public void destroy() {
+		
+	}
+	
 	private void broadcast(Packet message) {
 		this.getParentGame().getParentRoom().sendDataToAll(message);
 	}
@@ -48,6 +52,37 @@ public abstract class ServerGameObject extends GameObject {
 	
 	public String encode() {
 		return (this.getId() + SPLIT_CHAR + this.getColour().toString() + SPLIT_CHAR + this.getHitbox().toString() + SPLIT_CHAR + this.getPosition().toString());
+	}
+	
+	/**
+	 * Determines if this Game Object is Colliding With Another Object
+	 * https://www.geeksforgeeks.org/find-two-rectangles-overlap/ 
+	 * @param obj The Object to Check
+	 */
+	public boolean isColliding(GameObject obj) {
+		Vector2 l1 = this.getRelativeHitbox().getTopLeft();
+		Vector2 r1 = this.getRelativeHitbox().getBottomRight();
+		
+		Vector2 l2 = obj.getRelativeHitbox().getTopLeft();
+		Vector2 r2 = obj.getRelativeHitbox().getBottomRight();
+		
+		if (l1.getX() == r1.getX() || l1.getY() == r1.getY() || l2.getX() == r2.getX() || l2.getY() == r2.getY()) {
+			
+	        // The Line Can't Have Positive Overlap
+	        return false;
+	    }
+		 
+	    // If One Rectangle is On Left Side of Other
+	    if (l1.getX() >= r2.getX() || l2.getX() >= r1.getX()) {	    	
+	    	return false;
+	    }
+	 
+	    // If One Rectangle is Above Other
+	    if (r1.getY() >= l2.getY() || r2.getY() >= l1.getY()) {	    	
+	    	return false;
+	    }
+	    
+	    return true;
 	}
 
 	public GameManager getParentGame() {

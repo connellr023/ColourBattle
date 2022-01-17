@@ -67,7 +67,7 @@ public class RoomHandler {
 	public void stop() {
 		ServerSocketStream server = SocketServerManager.getServer();
 		
-		this.getGame().setRunning(false);
+		this.getGame().stop();
 		
 		for (ClientHandler client : this.getClients()) {
 			client.stop();

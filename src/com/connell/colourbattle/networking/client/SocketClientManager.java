@@ -27,6 +27,13 @@ public class SocketClientManager {
 			View.loadEvents();
 		}
 	}
+	
+	public static void stopClient() {
+		if (getClient() != null) {			
+			getClient().stop();
+			getClientThread().interrupt();
+		}
+	}
 
 	public static ClientSocketStream getClient() {
 		return client;

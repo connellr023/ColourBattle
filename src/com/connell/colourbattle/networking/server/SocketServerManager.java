@@ -27,7 +27,10 @@ public class SocketServerManager {
 	}
 	
 	public static void stopServer() {
-		getServer().stop();
+		if (getServer() != null) {			
+			getServer().stop();
+			getServerThread().interrupt();
+		}
 	}
 
 	public static ServerSocketStream getServer() {
