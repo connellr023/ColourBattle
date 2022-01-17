@@ -6,6 +6,7 @@ import processing.core.PFont;
 import java.util.LinkedList;
 
 import com.connell.colourbattle.graphics.view.View;
+import com.connell.colourbattle.utilities.Constants;
 import com.connell.colourbattle.utilities.Vector2;
 
 public class RenderingManager extends PApplet {
@@ -21,14 +22,14 @@ public class RenderingManager extends PApplet {
 	
 	private static int lastKeyCode;
 	
-	public static void init(int frameRate, int scale, Vector2 canvasSize) {
+	public static void init(int frameRate, int scale) {
 		setViews(new LinkedList<View>());
 		setActiveViewIndex(0);
 		
 		setRenderer(new RenderingManager());
 		setFrameRate(frameRate);
 		setScale(scale);
-		setScreenSize(canvasSize);
+		setScreenSize(Constants.GAME_SIZE);
 	}
 	
 	public static void run(String[] pArgs) {

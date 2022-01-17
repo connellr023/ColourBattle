@@ -14,11 +14,19 @@ public class Platform extends ServerGameObject {
 
 	@Override
 	public void start() {
-		
+		this.broadcastSelf();
 	}
 	
 	@Override
 	public void update() {
 
+	}
+	
+	public static Platform random() {
+		
+	}
+	
+	public boolean doesIntersect() {
+		
 	}
 }

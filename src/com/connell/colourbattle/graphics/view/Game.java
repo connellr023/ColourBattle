@@ -23,7 +23,7 @@ public class Game extends View {
 		Vector2 screenCenter = RenderingManager.getScreenCenter();
 		float scale = RenderingManager.getScale();
 		
-		this.timerText = createStandardText("", 23, new Colour(50, 255, 50), new Vector2(screenCenter.getX(), 1.2f * scale));
+		this.timerText = createStandardText("", 35, new Colour(50, 255, 50), new Vector2(screenCenter.getX(), 1.2f * scale));
 		
 		addClientSocketEvent(new SocketEvent("update_timer", this) {
 			@Override

@@ -1,14 +1,17 @@
 package com.connell.colourbattle.networking.server.game;
 
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ThreadLocalRandom;
 
 import com.connell.colourbattle.networking.Packet;
 import com.connell.colourbattle.networking.server.RoomHandler;
+import com.connell.colourbattle.utilities.Constants;
 import com.connell.colourbattle.utilities.Hitbox;
 import com.connell.colourbattle.utilities.Vector2;
 
 public class GameManager implements Runnable {
 	private ConcurrentLinkedQueue<ServerGameObject> gameObjects;
+	private Vector2 gameSize;
 	
 	private boolean isRunning;
 	
@@ -22,6 +25,7 @@ public class GameManager implements Runnable {
 	public GameManager(RoomHandler parentRoom, int ticksPerSecond, int startingTime) {
 		this.setParentRoom(parentRoom);
 		this.setTimeLeft(startingTime);
+		this.setGameSize(Constants.GAME_SIZE);
 		
 		this.setTicksPerSecond(ticksPerSecond);
 		this.setTickCount(0);
@@ -56,11 +60,22 @@ public class GameManager implements Runnable {
 	}
 
 	private void start() {
-		Platform floor = new Platform(this, new Vector2(20, 20), new Hitbox(new Vector2(0, 0), new Vector2(5, 5)));
+		this.generateLevel(25, 30);
+	}
+	
+	private void generateLevel(int minPlatforms, int maxPlatforms) {
+		ConcurrentLinkedQueue<ServerGameObject> gameObjects = this.getGameObjects();
+		Vector2 gameSize = this.getGameSize();
 		
-//		for (int i = 0; i < this.getParentRoom().getClientCount(); i++) {
-//			this.getGameObjects().add(new Player());
-//		}
+		Platform floor = new Platform(this, new Vector2(gameSize.getX() / 2, gameSize.getY()), new Hitbox(new Vector2(0, 0), new Vector2(gameSize.getX(), 2)));
+		gameObjects.add(floor);
+		
+		int count = ThreadLocalRandom.current().nextInt(minPlatforms, maxPlatforms + 1);
+		
+		for (int i = 0; i < count; i++) {
+			Platform p = Platform.random();
+			gameObjects.add(p);
+		}
 	}
 	
 	private void update() {
@@ -134,5 +149,13 @@ public class GameManager implements Runnable {
 
 	public void setGameObjects(ConcurrentLinkedQueue<ServerGameObject> gameObjects) {
 		this.gameObjects = gameObjects;
+	}
+
+	public Vector2 getGameSize() {
+		return gameSize;
+	}
+
+	public void setGameSize(Vector2 gameSize) {
+		this.gameSize = gameSize;
 	}
 }
