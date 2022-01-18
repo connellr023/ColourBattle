@@ -96,10 +96,10 @@ public class GameManager implements Runnable {
 			}
 		}
 		
-		for (ClientHandler client : this.getParentRoom().getClients()) {
-			System.out.println("test");
-			this.addPlayer(new Player(this, client, new Colour(255, 0, 240)));
-		}
+//		for (ClientHandler client : this.getParentRoom().getClients()) {
+//			this.addPlayer(new Player(this, client, new Colour(255, 0, 240)));
+//		}
+		this.addPlayer(new Player(this, new Colour(255, 0, 240)));
 	}
 	
 	private void update() {

@@ -5,7 +5,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
-import java.util.LinkedList;
+import java.util.HashMap;
 
 public abstract class SocketHandler implements Runnable {
 	private Socket clientSocket;
@@ -13,10 +13,10 @@ public abstract class SocketHandler implements Runnable {
 	private BufferedReader in;
 	private PrintWriter out;
 	
-	private LinkedList<SocketEvent> socketEvents;
+	private HashMap<String, SocketEvent> socketEvents;
 	
 	public SocketHandler() {
-		this.setSocketEvents(new LinkedList<SocketEvent>());
+		this.setSocketEvents(new HashMap<String, SocketEvent>());
 		
 		this.start();
 	}
@@ -25,7 +25,9 @@ public abstract class SocketHandler implements Runnable {
 	public abstract void stop();
 	
 	public void listen(SocketEvent event) {
-		this.getSocketEvents().add(event);
+		String eventName = event.getEvent();
+		
+		this.getSocketEvents().put(eventName, event);
 	}
 	
 	protected void initIOStream() {
@@ -43,15 +45,10 @@ public abstract class SocketHandler implements Runnable {
 		
 		if (!(recvData = this.getIn().readLine()).equals(null)) {
 			Packet message = Packet.decode(recvData);
+			String eventName = message.getEvent();
 			
-			if (!message.getData().equals("")) {
-				for (SocketEvent event : this.getSocketEvents()) {
-					if (message.getEvent().equals(event.getEvent())) {
-						event.call(message.getData());
-						break;
-					}
-				}
-			}
+			SocketEvent event = this.getSocketEvents().get(eventName);
+			event.call(message.getData());
 		}
 	}
 	
@@ -91,11 +88,11 @@ public abstract class SocketHandler implements Runnable {
 		this.clientSocket = clientSocket;
 	}
 
-	private LinkedList<SocketEvent> getSocketEvents() {
+	private HashMap<String, SocketEvent> getSocketEvents() {
 		return socketEvents;
 	}
 
-	private void setSocketEvents(LinkedList<SocketEvent> socketEvents) {
+	private void setSocketEvents(HashMap<String, SocketEvent> socketEvents) {
 		this.socketEvents = socketEvents;
 	}
 }

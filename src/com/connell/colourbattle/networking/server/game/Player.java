@@ -2,8 +2,6 @@ package com.connell.colourbattle.networking.server.game;
 
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
-
-import com.connell.colourbattle.networking.server.ClientHandler;
 import com.connell.colourbattle.utilities.Colour;
 import com.connell.colourbattle.utilities.Constants;
 import com.connell.colourbattle.utilities.GameObject;
@@ -11,7 +9,6 @@ import com.connell.colourbattle.utilities.Vector2;
 
 public class Player extends ServerGameObject {
 	private LinkedList<Platform> collisions;
-	private ClientHandler client;
 	
 	private Vector2 velocity;
 	
@@ -20,18 +17,16 @@ public class Player extends ServerGameObject {
 	private boolean onGround;
 	
 	private boolean isCollidingUpward;
-	private boolean isCollidingDown;
 	private boolean isCollidingLeft;
 	private boolean isCollidingRight;
 
-	public Player(GameManager parentGame, ClientHandler client, Colour colour) {
+	public Player(GameManager parentGame, Colour colour) {
 		super(parentGame);
 		
 		this.setColour(colour);
-		
-		this.setClient(client);
+
 		this.setVelocity(Vector2.ZERO);
-		this.setGravityAcceleration(0.05f);
+		this.setGravityAcceleration(0.0013f);
 		
 		this.setCollisions(new LinkedList<Platform>());
 		
@@ -39,7 +34,7 @@ public class Player extends ServerGameObject {
 
 	@Override
 	public void start() {
-		this.setPosition(this.generateSpawnPoint());
+		//this.setPosition(this.generateSpawnPoint());
 		this.broadcastSelf();
 	}
 	
@@ -47,6 +42,8 @@ public class Player extends ServerGameObject {
 	public void update() {
 		this.updateLevelCollisions();
 		this.handlePhysics();
+		
+		this.updateSelf();
 	}
 	
 	/**
@@ -155,14 +152,6 @@ public class Player extends ServerGameObject {
 		}
 		
 		return c;
-	}
-
-	public ClientHandler getClient() {
-		return client;
-	}
-
-	public void setClient(ClientHandler client) {
-		this.client = client;
 	}
 
 	public LinkedList<Platform> getCollisions() {

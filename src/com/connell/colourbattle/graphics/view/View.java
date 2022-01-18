@@ -1,6 +1,6 @@
 package com.connell.colourbattle.graphics.view;
 
-import java.util.LinkedList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import com.connell.colourbattle.graphics.RenderingManager;
 import com.connell.colourbattle.graphics.ui.*;
@@ -11,7 +11,7 @@ import com.connell.colourbattle.utilities.*;
 import processing.core.PConstants;
 
 public abstract class View {
-	private static LinkedList<SocketEvent> events = new LinkedList<SocketEvent>();
+	private static ConcurrentLinkedQueue<SocketEvent> pendingEvents = new ConcurrentLinkedQueue<SocketEvent>();
 	
 	public static void registerViews() {
 		RenderingManager.addView(new Menu());
@@ -26,13 +26,13 @@ public abstract class View {
 	}
 	
 	public static void loadEvents() {
-		for (SocketEvent e : getEvents()) {
+		for (SocketEvent e : getPendingEvents()) {
 			SocketClientManager.getClient().listen(e);
 		}
 	}
 	
 	protected static void addClientSocketEvent(SocketEvent event) {
-		getEvents().add(event);
+		getPendingEvents().add(event);
 	}
 	
 	public abstract void start();
@@ -46,11 +46,11 @@ public abstract class View {
 		return new InputField(screenPosition, new Colour(0, 0, 0), new Colour(171, 171, 171), new Colour(255, 255, 255), scale, RenderingManager.getMainFont(), 17);
 	}
 
-	protected static LinkedList<SocketEvent> getEvents() {
-		return events;
+	protected static ConcurrentLinkedQueue<SocketEvent> getPendingEvents() {
+		return pendingEvents;
 	}
 
-	protected static void setEvents(LinkedList<SocketEvent> events) {
-		View.events = events;
+	protected static void setPendingEvents(ConcurrentLinkedQueue<SocketEvent> pendingEvents) {
+		View.pendingEvents = pendingEvents;
 	}
 }

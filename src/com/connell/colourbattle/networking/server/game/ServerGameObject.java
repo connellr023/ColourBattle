@@ -32,8 +32,8 @@ public abstract class ServerGameObject extends GameObject {
 		this.broadcast(new Packet("new_object", this.encode()));
 	}
 	
-	protected void broadcastPosition() {
-		this.broadcast(new Packet(this.getId() + "_update_position", this.getPosition().toString()));
+	protected void updateSelf() {
+		this.broadcast(new Packet(this.getId() + "_update", this.encode()));
 	}
 	
 	public static GameObject decode(String str) {

@@ -42,6 +42,18 @@ public class Game extends View {
 				String id = o.getId();
 				
 				g.getGameObjects().put(id, new ClientGameObject(o));
+				
+				addClientSocketEvent(new SocketEvent(id + "_update", g) {
+					@Override
+					public void call(String data) {
+						Game g = (Game) this.getObject();
+						GameObject o = ServerGameObject.decode(data);
+						
+						String id = o.getId();
+						
+						g.getGameObjects().replace(id, new ClientGameObject(o));
+					}
+				});
 			}
 		});
 	}
