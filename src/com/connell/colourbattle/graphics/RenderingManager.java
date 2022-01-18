@@ -22,6 +22,8 @@ public class RenderingManager extends PApplet {
 	
 	private static int lastKeyCode;
 	
+	public static boolean inDebugMode;
+	
 	public static void init(int frameRate, int scale) {
 		setViews(new LinkedList<View>());
 		setActiveViewIndex(0);
@@ -30,6 +32,8 @@ public class RenderingManager extends PApplet {
 		setFrameRate(frameRate);
 		setScale(scale);
 		setScreenSize(Constants.GAME_SIZE);
+		
+		inDebugMode = false;
 	}
 	
 	public static void run(String[] pArgs) {
@@ -60,6 +64,11 @@ public class RenderingManager extends PApplet {
 	
 	public void keyPressed() {
 		setLastKeyCode(this.keyCode);
+		
+		// Toggle Debug Mode
+		if (this.keyCode == 16 && getActiveViewIndex() == 2) {
+			inDebugMode = !inDebugMode;
+		}
 	}
 	
 	public static void addView(View view) {

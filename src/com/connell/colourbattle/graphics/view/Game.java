@@ -1,6 +1,6 @@
 package com.connell.colourbattle.graphics.view;
 
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 import com.connell.colourbattle.graphics.ClientGameObject;
 import com.connell.colourbattle.graphics.RenderingManager;
@@ -12,7 +12,7 @@ import com.connell.colourbattle.utilities.GameObject;
 import com.connell.colourbattle.utilities.Vector2;
 
 public class Game extends View {
-	private HashMap<String, ClientGameObject> gameObjects = new HashMap<String, ClientGameObject>();
+	private ConcurrentHashMap<String, ClientGameObject> gameObjects = new ConcurrentHashMap<String, ClientGameObject>();
 	
 	private Text timerText;
 	
@@ -42,18 +42,6 @@ public class Game extends View {
 				String id = o.getId();
 				
 				g.getGameObjects().put(id, new ClientGameObject(o));
-				
-				addClientSocketEvent(new SocketEvent(id + "_update", g) {
-					@Override
-					public void call(String data) {
-						Game g = (Game) this.getObject();
-						GameObject o = ServerGameObject.decode(data);
-						
-						String id = o.getId();
-						
-						g.getGameObjects().replace(id, new ClientGameObject(o));
-					}
-				});
 			}
 		});
 	}
@@ -76,11 +64,11 @@ public class Game extends View {
 		this.timeLeft = timeLeft;
 	}
 
-	public HashMap<String, ClientGameObject> getGameObjects() {
+	public ConcurrentHashMap<String, ClientGameObject> getGameObjects() {
 		return gameObjects;
 	}
 
-	public void setGameObjects(HashMap<String, ClientGameObject> gameObjects) {
+	public void setGameObjects(ConcurrentHashMap<String, ClientGameObject> gameObjects) {
 		this.gameObjects = gameObjects;
 	}
 }

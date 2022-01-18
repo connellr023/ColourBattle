@@ -5,6 +5,7 @@ import java.util.concurrent.ThreadLocalRandom;
 import com.connell.colourbattle.utilities.Colour;
 import com.connell.colourbattle.utilities.Constants;
 import com.connell.colourbattle.utilities.GameObject;
+import com.connell.colourbattle.utilities.Hitbox;
 import com.connell.colourbattle.utilities.Vector2;
 
 public class Player extends ServerGameObject {
@@ -13,6 +14,41 @@ public class Player extends ServerGameObject {
 	private Vector2 velocity;
 	
 	private float gravityAcceleration;
+	
+	/**
+	 * The Value Added to Y Component of the Player's Velocity When Jumping
+	 */
+	private float jumpVelocity;
+	
+	/**
+	 * Maximum Amount of Jumps a Player Instance can Have
+	 */
+	private int maxJumps;
+	
+	/**
+	 * Keeps Track of Amount of Jumps this Player has Remaining
+	 */
+	private int jumpsLeft;
+	
+	/**
+	 * The Value Added to X Component of the Player's Velocity When Moving Left or Right
+	 */
+	private float moveVelocity;
+	
+	/**
+	 * Player Movement Velocity When in Air
+	 */
+	private float inAirMoveVelocity;
+	
+	/**
+	 * Acceleration During Horizontal Game Object Movement
+	 */
+	private float horizontalAcceleration;
+	
+	/**
+	 * True for a Single Frame this Player Lands on Ground
+	 */
+	private boolean hasLandedJump = false;
 	
 	private boolean onGround;
 	
@@ -24,17 +60,25 @@ public class Player extends ServerGameObject {
 		super(parentGame);
 		
 		this.setColour(colour);
+		this.setHitbox(new Hitbox(new Vector2(0, 0), new Vector2(1, 1)));
 
 		this.setVelocity(Vector2.ZERO);
-		this.setGravityAcceleration(0.0013f);
+		this.setGravityAcceleration(0.015f);
+		this.setMoveVelocity(0.19f);
+		this.setInAirMoveVelocity(0.15f);
+		this.setHorizontalAcceleration(0.006f);
+		
+		this.setMaxJumps(2);
+		this.setJumpVelocity(0.35f);
+		this.setMoveVelocity(0.25f);
+		this.setJumpsLeft(this.getMaxJumps());
 		
 		this.setCollisions(new LinkedList<Platform>());
-		
 	}
 
 	@Override
 	public void start() {
-		//this.setPosition(this.generateSpawnPoint());
+		this.setPosition(this.generateSpawnPoint());
 		this.broadcastSelf();
 	}
 	
@@ -43,7 +87,7 @@ public class Player extends ServerGameObject {
 		this.updateLevelCollisions();
 		this.handlePhysics();
 		
-		this.updateSelf();
+		this.updatePosition();
 	}
 	
 	/**
@@ -63,9 +107,8 @@ public class Player extends ServerGameObject {
 		int index = ThreadLocalRandom.current().nextInt(0, this.getParentGame().getLevel().size());
 		
 		Platform p = (Platform) this.getParentGame().getLevel().toArray()[index];
-		Vector2 pos = p.getRelativeHitbox().getTopLeft();
 		
-		return new Vector2(pos.getX(), pos.getY() + 10);
+		return new Vector2(p.getCenter().getX(), p.getTopY() - 2);
 	}
 	
 	private void handlePhysics() {
@@ -83,6 +126,9 @@ public class Player extends ServerGameObject {
 			
 			if (this.getPosition().getY() > Constants.GAME_SIZE.getY() + 5) {
 				this.destroy();
+			}
+			else if (!this.onGround) {
+				this.hasLandedJump = false;
 			}
 		}
 		
@@ -120,6 +166,13 @@ public class Player extends ServerGameObject {
 					// Create Friction on Ground
 					if (this.onGround) {
 						this.setHorizontalVelocity(this.getVelocity().getX() * p.getFrictionFactor());
+						
+						if (!this.hasLandedJump) {
+							this.moveOutsideObject(p);
+							
+							this.setJumpsLeft(this.getMaxJumps());
+							this.hasLandedJump = true;
+						}
 					}
 				}
 				else if (this.getTopY() >= p.getBottomY()) { // On Bottom
@@ -139,8 +192,57 @@ public class Player extends ServerGameObject {
 	 * @param collidingObj Is the Game Object Being Collided With
 	 */
 	public void moveOutsideObject(GameObject collidingObj) {
-		if (this.onGround) {			
-			this.setY(collidingObj.getPosition().getY() - (collidingObj.getHitbox().getBottomRight().getY()));
+		if (this.onGround) {
+			this.setY(collidingObj.getTopY() - this.getHitbox().getHeight());
+		}
+	}
+	
+	/*
+	 * Makes this Player Move Left
+	 */
+	public void moveLeft() {
+		this.setMoveVelocity(-Math.abs(this.getMoveVelocity()))  ;
+		
+		if (!this.isCollidingRight) {			
+			float vel = this.getMoveVelocity();
+			
+			if (!this.onGround) {
+				vel = -this.getInAirMoveVelocity();
+			}
+
+			this.setX(this.getPosition().getX() - this.getHorizontalAcceleration());
+			this.setHorizontalVelocity(vel);
+		}
+	}
+	
+	/**
+	 * Makes this Player Move Right
+	 */
+	public void moveRight() {
+		this.setMoveVelocity(Math.abs(this.getMoveVelocity()));
+		
+		if (!this.isCollidingLeft) {
+			float vel = this.getMoveVelocity();
+			
+			if (!this.onGround) {
+				vel = this.getInAirMoveVelocity();
+			}
+			
+			this.setX(this.getPosition().getX() + this.getHorizontalAcceleration());
+			this.setHorizontalVelocity(vel);
+		}
+	}
+	
+	/**
+	 * Makes this Player Jump
+	 */
+	public void jump() {
+		if (this.getJumpsLeft() > 0 && !this.isCollidingLeft && !this.isCollidingRight) {
+			this.setY(this.getPosition().getY() - this.getGravityAcceleration());
+			this.setVerticalVelocity(-this.getJumpVelocity());
+			this.setJumpsLeft(this.getJumpsLeft() - 1);
+			
+			this.onGround = false;
 		}
 	}
 	
@@ -184,5 +286,53 @@ public class Player extends ServerGameObject {
 
 	public void setGravityAcceleration(float gravityAcceleration) {
 		this.gravityAcceleration = gravityAcceleration;
+	}
+
+	public float getMoveVelocity() {
+		return moveVelocity;
+	}
+
+	public void setMoveVelocity(float moveVelocity) {
+		this.moveVelocity = moveVelocity;
+	}
+
+	public float getInAirMoveVelocity() {
+		return inAirMoveVelocity;
+	}
+
+	public void setInAirMoveVelocity(float inAirMoveVelocity) {
+		this.inAirMoveVelocity = inAirMoveVelocity;
+	}
+
+	public float getHorizontalAcceleration() {
+		return horizontalAcceleration;
+	}
+
+	public void setHorizontalAcceleration(float horizontalAcceleration) {
+		this.horizontalAcceleration = horizontalAcceleration;
+	}
+
+	public float getJumpVelocity() {
+		return jumpVelocity;
+	}
+
+	public void setJumpVelocity(float jumpVelocity) {
+		this.jumpVelocity = jumpVelocity;
+	}
+
+	public int getMaxJumps() {
+		return maxJumps;
+	}
+
+	public void setMaxJumps(int maxJumps) {
+		this.maxJumps = maxJumps;
+	}
+
+	public int getJumpsLeft() {
+		return jumpsLeft;
+	}
+
+	public void setJumpsLeft(int jumpsLeft) {
+		this.jumpsLeft = jumpsLeft;
 	}
 }

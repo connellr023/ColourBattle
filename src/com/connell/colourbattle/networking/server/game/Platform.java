@@ -35,7 +35,7 @@ public class Platform extends ServerGameObject {
 		Vector2 gameSize = Constants.GAME_SIZE;
 		
 		Hitbox collider = new Hitbox(Vector2.ZERO, new Vector2(width, height));
-		Vector2 position = new Vector2(ThreadLocalRandom.current().nextInt(0, (int) gameSize.getX()), ThreadLocalRandom.current().nextInt(0, (int) gameSize.getY()));
+		Vector2 position = new Vector2(ThreadLocalRandom.current().nextInt(0, (int) gameSize.getX()), ThreadLocalRandom.current().nextInt(0, (int) gameSize.getY() - 1));
 		
 		Platform p = new Platform(parentGame, position, collider, frictionFactor);
 		

@@ -27,6 +27,10 @@ public class Vector2 {
 		return new Vector2(x, y);
 	}
 	
+	public static Vector2 lerp(Vector2 a, Vector2 b, float f) {
+		return new Vector2(a.getX() + f * (b.getX() - a.getX()), a.getY() + f * (b.getY() - a.getY()));
+	}
+	
 	@Override
 	public String toString() {
 		return (this.getX() + "" + SPLIT_CHAR + this.getY());

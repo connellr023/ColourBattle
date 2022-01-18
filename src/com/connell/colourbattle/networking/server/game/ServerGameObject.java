@@ -36,6 +36,10 @@ public abstract class ServerGameObject extends GameObject {
 		this.broadcast(new Packet(this.getId() + "_update", this.encode()));
 	}
 	
+	protected void updatePosition() {
+		this.broadcast(new Packet(this.getId() + "_update_position", this.getPosition().toString()));
+	}
+	
 	public static GameObject decode(String str) {
 		String[] split = str.split(SPLIT_CHAR + "");
 		

@@ -31,7 +31,7 @@ public abstract class View {
 		}
 	}
 	
-	protected static void addClientSocketEvent(SocketEvent event) {
+	public static void addClientSocketEvent(SocketEvent event) {
 		getPendingEvents().add(event);
 	}
 	
