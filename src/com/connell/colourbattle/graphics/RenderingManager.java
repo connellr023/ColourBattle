@@ -65,8 +65,10 @@ public class RenderingManager extends PApplet {
 	public void keyPressed() {
 		setLastKeyCode(this.keyCode);
 		
+		boolean inGame = (getActiveViewIndex() == 2);
+		
 		// Toggle Debug Mode
-		if (this.keyCode == 16 && getActiveViewIndex() == 2) {
+		if (this.keyCode == 16 && inGame) {
 			inDebugMode = !inDebugMode;
 		}
 	}

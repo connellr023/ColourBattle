@@ -5,7 +5,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import com.connell.colourbattle.graphics.ClientGameObject;
 import com.connell.colourbattle.graphics.RenderingManager;
 import com.connell.colourbattle.graphics.ui.Text;
+import com.connell.colourbattle.networking.Packet;
 import com.connell.colourbattle.networking.SocketEvent;
+import com.connell.colourbattle.networking.client.ClientSocketStream;
+import com.connell.colourbattle.networking.client.SocketClientManager;
 import com.connell.colourbattle.networking.server.game.ServerGameObject;
 import com.connell.colourbattle.utilities.Colour;
 import com.connell.colourbattle.utilities.GameObject;
@@ -18,12 +21,16 @@ public class Game extends View {
 	
 	private int timeLeft;
 	
+	private boolean justJumped;
+	
 	@Override
 	public void start() {
 		Vector2 screenCenter = RenderingManager.getScreenCenter();
 		float scale = RenderingManager.getScale();
 		
-		this.timerText = createStandardText("", 38, new Colour(33, 255, 55), new Vector2(screenCenter.getX(), 1.2f * scale));
+		this.justJumped = false;
+		
+		this.timerText = createStandardText("", 42, new Colour(252, 20, 47), new Vector2(screenCenter.getX(), 0.5f * scale));
 		
 		addClientSocketEvent(new SocketEvent("update_timer", this) {
 			@Override
@@ -54,6 +61,28 @@ public class Game extends View {
 		
 		this.timerText.setBody("Time Left: " + this.getTimeLeft());
 		this.timerText.render();
+		
+		ClientSocketStream client = SocketClientManager.getClient();
+		RenderingManager renderer = RenderingManager.getRenderer();
+		
+		if (renderer.keyPressed) {
+			int lastKey = RenderingManager.getLastKeyCode();
+			
+			if (!this.justJumped && (lastKey == 87 || lastKey == 38 || lastKey == 32)) { // Jump
+				client.sendData(new Packet("jump"));
+				this.justJumped = true;
+			}
+			
+			if (lastKey == 65 || lastKey == 37) { // Move left
+				client.sendData(new Packet("move_left"));
+			}
+			else if (lastKey == 68 || lastKey == 39) { // Move right
+				client.sendData(new Packet("move_right"));
+			}
+		}
+		else {
+			this.justJumped = false;
+		}
 	}
 
 	public int getTimeLeft() {

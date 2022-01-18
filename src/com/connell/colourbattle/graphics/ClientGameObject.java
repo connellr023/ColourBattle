@@ -27,6 +27,14 @@ public class ClientGameObject extends RenderableObject {
 				g.setPosition(Vector2.parse(data));
 			}
 		});
+		
+		client.listen(new SocketEvent(this.getReferenceObject().getId() + "_update_colour", this.getReferenceObject()) {
+			@Override
+			public void call(String data) {
+				GameObject g = (GameObject) this.getObject();
+				g.setColour(Colour.parse(data));
+			}
+		});
 	}
 	
 	@Override

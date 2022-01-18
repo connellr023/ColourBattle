@@ -2,6 +2,9 @@ package com.connell.colourbattle.networking.server.game;
 
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
+
+import com.connell.colourbattle.networking.SocketEvent;
+import com.connell.colourbattle.networking.server.ClientHandler;
 import com.connell.colourbattle.utilities.Colour;
 import com.connell.colourbattle.utilities.Constants;
 import com.connell.colourbattle.utilities.GameObject;
@@ -9,6 +12,8 @@ import com.connell.colourbattle.utilities.Hitbox;
 import com.connell.colourbattle.utilities.Vector2;
 
 public class Player extends ServerGameObject {
+	private ClientHandler clientHandler;
+	
 	private LinkedList<Platform> collisions;
 	
 	private Vector2 velocity;
@@ -56,21 +61,22 @@ public class Player extends ServerGameObject {
 	private boolean isCollidingLeft;
 	private boolean isCollidingRight;
 
-	public Player(GameManager parentGame, Colour colour) {
+	public Player(GameManager parentGame, ClientHandler clientHandler, Colour colour) {
 		super(parentGame);
+		
+		this.setClientHandler(clientHandler);
 		
 		this.setColour(colour);
 		this.setHitbox(new Hitbox(new Vector2(0, 0), new Vector2(1, 1)));
 
 		this.setVelocity(Vector2.ZERO);
-		this.setGravityAcceleration(0.015f);
-		this.setMoveVelocity(0.19f);
+		this.setGravityAcceleration(0.012f);
+		this.setMoveVelocity(0.23f);
 		this.setInAirMoveVelocity(0.15f);
 		this.setHorizontalAcceleration(0.006f);
 		
 		this.setMaxJumps(2);
-		this.setJumpVelocity(0.35f);
-		this.setMoveVelocity(0.25f);
+		this.setJumpVelocity(0.36f);
 		this.setJumpsLeft(this.getMaxJumps());
 		
 		this.setCollisions(new LinkedList<Platform>());
@@ -80,6 +86,37 @@ public class Player extends ServerGameObject {
 	public void start() {
 		this.setPosition(this.generateSpawnPoint());
 		this.broadcastSelf();
+		
+		ClientHandler client = this.getClientHandler();
+		
+		client.listen(new SocketEvent("jump", this) {
+			@Override
+			public void call(String data) {
+				Player p = (Player) this.getObject();
+				p.jump();
+			}
+		});
+		
+		client.listen(new SocketEvent("move_left", this) {
+			@Override
+			public void call(String data) {
+				Player p = (Player) this.getObject();
+				p.moveLeft();
+			}
+		});
+		
+		client.listen(new SocketEvent("move_right", this) {
+			@Override
+			public void call(String data) {
+				Player p = (Player) this.getObject();
+				p.moveRight();
+			}
+		});
+	}
+	
+	private void onCollisionWithPlatform(Platform platform) {
+		platform.setColour(this.getColour());
+		platform.updateColour();
 	}
 	
 	@Override
@@ -136,7 +173,11 @@ public class Player extends ServerGameObject {
 	}
 	
 	private void handlePlatformCollisions() {
-		for (Platform p : this.getCollisions()) {			
+		for (Platform p : this.getCollisions()) {
+			if (this.getBottomY() <= p.getTopY()) {
+				this.onCollisionWithPlatform(p);
+			}
+			
 			this.isCollidingUpward = false;
 			this.isCollidingLeft = false;
 			this.isCollidingRight = false;
@@ -193,7 +234,7 @@ public class Player extends ServerGameObject {
 	 */
 	public void moveOutsideObject(GameObject collidingObj) {
 		if (this.onGround) {
-			this.setY(collidingObj.getTopY() - this.getHitbox().getHeight());
+			this.setY(collidingObj.getTopY() - 1.01f);
 		}
 	}
 	
@@ -334,5 +375,13 @@ public class Player extends ServerGameObject {
 
 	public void setJumpsLeft(int jumpsLeft) {
 		this.jumpsLeft = jumpsLeft;
+	}
+
+	public ClientHandler getClientHandler() {
+		return clientHandler;
+	}
+
+	public void setClientHandler(ClientHandler clientHandler) {
+		this.clientHandler = clientHandler;
 	}
 }

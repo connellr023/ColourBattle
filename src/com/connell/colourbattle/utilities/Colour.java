@@ -1,5 +1,7 @@
 package com.connell.colourbattle.utilities;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public class Colour {
 	private static char SPLIT_CHAR = ',';
 	
@@ -29,6 +31,18 @@ public class Colour {
 		int b = Integer.parseInt(split[2]);
 		
 		return new Colour(r, g, b);
+	}
+	
+	public static Colour random() {
+		int r = ThreadLocalRandom.current().nextInt(0, 255);
+		int g = ThreadLocalRandom.current().nextInt(0, 255);
+		int b = ThreadLocalRandom.current().nextInt(0, 255);
+		
+		return new Colour(r, g, b);
+	}
+	
+	public static Colour lerp(Colour a, Colour b, float f) {
+		return new Colour((int) (a.r + f * (b.r - a.r)), (int) (a.g + f * (b.g - a.g)), (int) (a.b + f * (b.b - a.b)));
 	}
 	
 	@Override

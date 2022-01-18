@@ -67,7 +67,6 @@ public class ClientSocketStream extends SocketHandler {
 		System.out.println("Disconnected From Server");
 		
 		SocketClientManager.stopClient();
-		
 		RenderingManager.setActiveViewIndex(0);
 	}
 	
