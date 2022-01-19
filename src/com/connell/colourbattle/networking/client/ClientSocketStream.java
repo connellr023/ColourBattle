@@ -65,9 +65,7 @@ public class ClientSocketStream extends SocketHandler {
 	@Override
 	public void handleDisconnect() {
 		System.out.println("Disconnected From Server");
-		
 		SocketClientManager.stopClient();
-		RenderingManager.setActiveViewIndex(0);
 	}
 	
 	@Override

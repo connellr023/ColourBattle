@@ -1,5 +1,7 @@
 package com.connell.colourbattle.networking.server.game;
 
+import java.util.HashMap;
+import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.ThreadLocalRandom;
 
@@ -45,7 +47,7 @@ public class GameManager implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.start();
+			this.generateLevel(25, 30);
 			this.loadGameObjects();
 			
 			this.setRunning(true);
@@ -76,10 +78,6 @@ public class GameManager implements Runnable {
 			object.start();
 		}
 	}
-
-	private void start() {
-		this.generateLevel(25, 30);
-	}
 	
 	private void generateLevel(int minPlatforms, int maxPlatforms) {
 		Vector2 gameSize = this.getGameSize();
@@ -102,6 +100,38 @@ public class GameManager implements Runnable {
 		}
 	}
 	
+	public void broadcastWinner() {
+		HashMap<Colour, Integer> platformColourCount = new HashMap<Colour, Integer>();
+		
+		for (Platform p : this.getLevel()) {
+			int c = platformColourCount.get(p.getColour());
+			platformColourCount.put(p.getColour(), c + 1);
+		}
+		
+		Entry<Colour, Integer> highestEntry = null;
+		
+		for (Entry<Colour, Integer> entry : platformColourCount.entrySet())
+		{
+		    if (highestEntry == null || entry.getValue().compareTo(highestEntry.getValue()) > 0)
+		    {
+		    	highestEntry = entry;
+		    }
+		}
+		
+		for (Player p : this.getPlayers()) {
+			ClientHandler client = p.getClientHandler();
+			
+			if (p.getColour().equals(highestEntry.getKey())) {
+				client.sendData(new Packet("game_end_win"));
+			}
+			else {
+				client.sendData(new Packet("game_end_lose"));
+			}
+		}
+		
+		this.getParentRoom().stop();
+	}
+	
 	private void update() {
 		this.updateGameObjects();
 		this.updateTimer();
@@ -114,15 +144,12 @@ public class GameManager implements Runnable {
 	}
 	
 	private void updateTimer() {
-		RoomHandler room = this.getParentRoom();
-		
 		if (this.getTickCount() % this.getTicksPerSecond() == 0) {
 			if (this.getTimeLeft() == 0) {
-				room.sendDataToAll(new Packet("game_over"));
-				room.stop();
+				this.broadcastWinner();
 			}
 			
-			room.sendDataToAll(new Packet("update_timer", this.getTimeLeft() + ""));
+			this.getParentRoom().sendDataToAll(new Packet("update_timer", this.getTimeLeft() + ""));
 			this.setTimeLeft(this.getTimeLeft() - 1);
 		}
 	}
