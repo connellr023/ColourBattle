@@ -174,7 +174,7 @@ public class Player extends ServerGameObject {
 	
 	private void handlePlatformCollisions() {
 		for (Platform p : this.getCollisions()) {
-			if (this.getBottomY() <= p.getTopY()) {
+			if (this.getBottomY() <= p.getTopY() && this.hasLandedJump) {
 				this.onCollisionWithPlatform(p);
 			}
 			
