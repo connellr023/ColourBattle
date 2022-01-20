@@ -29,11 +29,11 @@ public class GameManager implements Runnable {
 	
 	private int timeLeft;
 	
-	public GameManager(RoomHandler parentRoom, int startingTime) {
+	public GameManager(RoomHandler parentRoom) {
 		this.setTicksPerSecond(60);
+		this.setTimeLeft(75);
 		
 		this.setParentRoom(parentRoom);
-		this.setTimeLeft(startingTime);
 		this.setGameSize(Constants.GAME_SIZE);
 		
 		this.setTicksPerSecond(ticksPerSecond);
@@ -104,29 +104,44 @@ public class GameManager implements Runnable {
 		HashMap<Colour, Integer> platformColourCount = new HashMap<Colour, Integer>();
 		
 		for (Platform p : this.getLevel()) {
-			int c = platformColourCount.get(p.getColour());
+			int c = 0;
+			
+			if (platformColourCount.containsKey(p.getColour())) {
+				c = platformColourCount.get(p.getColour());
+			}
+			
 			platformColourCount.put(p.getColour(), c + 1);
 		}
 		
 		Entry<Colour, Integer> highestEntry = null;
+		boolean isDraw = true;
 		
 		for (Entry<Colour, Integer> entry : platformColourCount.entrySet())
 		{
+			if (highestEntry != null && !entry.getValue().equals(highestEntry.getValue())) {
+				isDraw = false;
+			}
+			
 		    if (highestEntry == null || entry.getValue().compareTo(highestEntry.getValue()) > 0)
 		    {
 		    	highestEntry = entry;
 		    }
 		}
 		
-		for (Player p : this.getPlayers()) {
-			ClientHandler client = p.getClientHandler();
-			
-			if (p.getColour().equals(highestEntry.getKey())) {
-				client.sendData(new Packet("game_end_win"));
+		if (!isDraw || highestEntry == null) {
+			for (Player p : this.getPlayers()) {
+				ClientHandler client = p.getClientHandler();
+				
+				if (p.getColour().equals(highestEntry.getKey())) {
+					client.sendData(new Packet("game_end_win"));
+				}
+				else {
+					client.sendData(new Packet("game_end_lose"));
+				}
 			}
-			else {
-				client.sendData(new Packet("game_end_lose"));
-			}
+		}
+		else {
+			this.getParentRoom().sendDataToAll(new Packet("game_end_draw"));
 		}
 		
 		this.getParentRoom().stop();

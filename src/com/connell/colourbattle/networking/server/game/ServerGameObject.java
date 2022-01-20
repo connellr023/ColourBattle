@@ -20,10 +20,6 @@ public abstract class ServerGameObject extends GameObject {
 	public abstract void start();
 	public abstract void update();
 	
-	public void destroy() {
-		
-	}
-	
 	private void broadcast(Packet message) {
 		this.getParentGame().getParentRoom().sendDataToAll(message);
 	}

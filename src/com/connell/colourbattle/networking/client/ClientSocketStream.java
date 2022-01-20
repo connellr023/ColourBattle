@@ -5,6 +5,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 
 import com.connell.colourbattle.graphics.RenderingManager;
+import com.connell.colourbattle.graphics.view.Game;
 import com.connell.colourbattle.networking.SocketEvent;
 import com.connell.colourbattle.networking.SocketHandler;
 
@@ -39,6 +40,9 @@ public class ClientSocketStream extends SocketHandler {
 			public void call(String data) {
 				System.out.println("Game Starting");
 				RenderingManager.setActiveViewIndex(2);
+				
+				Game game = (Game) RenderingManager.getViews().get(RenderingManager.getActiveViewIndex());
+				game.gameOver = false;
 			}
 		});
 	}

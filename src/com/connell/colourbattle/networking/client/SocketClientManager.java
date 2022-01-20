@@ -1,6 +1,5 @@
 package com.connell.colourbattle.networking.client;
 
-import com.connell.colourbattle.graphics.RenderingManager;
 import com.connell.colourbattle.graphics.view.Game;
 import com.connell.colourbattle.graphics.view.View;
 
@@ -36,11 +35,10 @@ public class SocketClientManager {
 			getClientThread().interrupt();
 			
 			try {
-				Game g = (Game) RenderingManager.getViews().get(2);
-				g.getGameObjects().clear();
+				Game.reset();
 			}
 			catch (Exception e) {
-				System.out.println("Did not reset views");
+				System.out.println("Did not reset game");
 			}
 		}
 	}

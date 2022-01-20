@@ -3,8 +3,10 @@ package com.connell.colourbattle.graphics.view;
 import java.util.concurrent.ConcurrentHashMap;
 
 import com.connell.colourbattle.graphics.ClientGameObject;
+import com.connell.colourbattle.graphics.PlayerMarker;
 import com.connell.colourbattle.graphics.RenderingManager;
 import com.connell.colourbattle.graphics.ui.Text;
+import com.connell.colourbattle.graphics.ui.button.BackHomeButton;
 import com.connell.colourbattle.networking.Packet;
 import com.connell.colourbattle.networking.SocketEvent;
 import com.connell.colourbattle.networking.client.ClientSocketStream;
@@ -21,6 +23,11 @@ public class Game extends View {
 	private Text timerText;
 	public Text gameEndText;
 	
+	private BackHomeButton backButton;
+	private BackHomeButton leaveButton;
+	
+	public PlayerMarker marker;
+	
 	private int timeLeft;
 	
 	private boolean justJumped;
@@ -35,7 +42,10 @@ public class Game extends View {
 		this.gameOver = false;
 		
 		this.timerText = createStandardText("", 42, new Colour(252, 20, 47), new Vector2(screenCenter.getX(), 0.5f * scale));
-		this.gameEndText = createStandardText("", 50, new Colour(252, 255, 255), screenCenter);
+		this.gameEndText = createStandardText("SERVER CLOSED", 70, new Colour(255, 0, 0), screenCenter);
+		
+		this.backButton = new BackHomeButton(new Vector2(screenCenter.getX(), screenCenter.getY() + (2.5f * scale)), "Back To Menu", 1.6f, RenderingManager.getMainFont());
+		this.leaveButton = new BackHomeButton(new Vector2(3.57f * scale, 0.5f * scale), "Leave Game", 1.2f, RenderingManager.getMainFont());
 		
 		addClientSocketEvent(new SocketEvent("update_timer", this) {
 			@Override
@@ -57,12 +67,20 @@ public class Game extends View {
 			}
 		});
 		
+		addClientSocketEvent(new SocketEvent("player_id", this) {
+			@Override
+			public void call(String data) {
+				Game g = (Game) this.getObject();
+				g.marker = new PlayerMarker(g.getGameObjects().get(data).getReferenceObject());
+			}
+		});
+		
 		addClientSocketEvent(new SocketEvent("game_end_win", this) {
 			@Override
 			public void call(String data) {
 				Game g = (Game) this.getObject();
 				
-				g.gameEndText.setBody("You Win!");
+				g.gameEndText.setBody("YOU WIN!");
 				g.gameEndText.setColour(new Colour(0, 255, 0));
 				
 				g.gameOver = true;
@@ -74,8 +92,18 @@ public class Game extends View {
 			public void call(String data) {
 				Game g = (Game) this.getObject();
 				
-				g.gameEndText.setBody("You Lose!");
-				g.gameEndText.setColour(new Colour(255, 0, 0));
+				g.gameEndText.setBody("YOU LOSE!");
+				g.gameOver = true;
+			}
+		});
+		
+		addClientSocketEvent(new SocketEvent("game_end_draw", this) {
+			@Override
+			public void call(String data) {
+				Game g = (Game) this.getObject();
+				
+				g.gameEndText.setBody("DRAW!");
+				g.gameEndText.setColour(new Colour(235, 235, 235));
 				
 				g.gameOver = true;
 			}
@@ -84,17 +112,23 @@ public class Game extends View {
 
 	@Override
 	public void render() {
-		for (ClientGameObject object : this.getGameObjects().values()) {
-			object.render();
-		}
-		
-		this.timerText.setBody("Time Left: " + this.getTimeLeft());
-		this.timerText.render();
-		
 		ClientSocketStream client = SocketClientManager.getClient();
 		RenderingManager renderer = RenderingManager.getRenderer();
-		
-		if (!this.gameOver) {			
+
+		if (!this.gameOver) {
+			for (ClientGameObject object : this.getGameObjects().values()) {
+				object.render();
+			}
+			
+			this.timerText.setBody("Time Left: " + this.getTimeLeft());
+			this.timerText.render();
+			
+			if (this.marker != null) {
+				this.marker.render();
+			}
+			
+			this.leaveButton.render();
+			
 			if (renderer.keyPressed) {
 				int lastKey = RenderingManager.getLastKeyCode();
 				
@@ -115,11 +149,19 @@ public class Game extends View {
 			}
 		}
 		else {
-			renderer.fill(renderer.color(0, 0, 0, 100));
+			renderer.fill(0);
 			renderer.rect(0, 0, Constants.GAME_SIZE.getX(), Constants.GAME_SIZE.getY());
 			
 			this.gameEndText.render();
+			this.backButton.render();
 		}
+	}
+	
+	public static void reset() {
+		Game game = (Game) RenderingManager.getViews().get(2);
+		
+		game.gameOver = true;
+		game.getGameObjects().clear();
 	}
 
 	public int getTimeLeft() {

@@ -38,7 +38,7 @@ public class RoomHandler {
 		if (this.getClientCount() >= this.getMaxClientCount()) {
 			this.sendDataToAll(new Packet("game_start"));
 			
-			this.setGame(new GameManager(this, 60));
+			this.setGame(new GameManager(this));
 			this.setGameThread(new Thread(this.getGame()));
 			
 			this.getGameThread().start();

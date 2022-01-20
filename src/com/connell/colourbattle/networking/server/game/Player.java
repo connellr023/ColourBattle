@@ -3,6 +3,7 @@ package com.connell.colourbattle.networking.server.game;
 import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 
+import com.connell.colourbattle.networking.Packet;
 import com.connell.colourbattle.networking.SocketEvent;
 import com.connell.colourbattle.networking.server.ClientHandler;
 import com.connell.colourbattle.utilities.Colour;
@@ -89,6 +90,8 @@ public class Player extends ServerGameObject {
 		
 		ClientHandler client = this.getClientHandler();
 		
+		client.sendData(new Packet("player_id", this.getId()));
+		
 		client.listen(new SocketEvent("jump", this) {
 			@Override
 			public void call(String data) {
@@ -162,7 +165,7 @@ public class Player extends ServerGameObject {
 			this.setVerticalVelocity(this.getVelocity().getY() + this.getGravityAcceleration());
 			
 			if (this.getPosition().getY() > Constants.GAME_SIZE.getY() + 5) {
-				this.destroy();
+				this.setPosition(this.generateSpawnPoint());
 			}
 			else if (!this.onGround) {
 				this.hasLandedJump = false;
@@ -174,9 +177,7 @@ public class Player extends ServerGameObject {
 	
 	private void handlePlatformCollisions() {
 		for (Platform p : this.getCollisions()) {
-			if (this.getBottomY() <= p.getTopY() && this.hasLandedJump) {
-				this.onCollisionWithPlatform(p);
-			}
+			this.onCollisionWithPlatform(p);
 			
 			this.isCollidingUpward = false;
 			this.isCollidingLeft = false;
