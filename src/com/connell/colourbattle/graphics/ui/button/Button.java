@@ -25,6 +25,16 @@ public abstract class Button extends UserInterface {
 	
 	private boolean justClicked;
 	
+	/**
+	 * Represents a button user interface element
+	 * @param screenPosition The position this should be on the screen
+	 * @param textColour The colour of the button inner text
+	 * @param colour The colour of the overall button
+	 * @param highlightColour The colour of the button when being highlighted
+	 * @param scale How big the button is
+	 * @param body The inner text of the button
+	 * @param font The font the text should be in
+	 */
 	public Button(Vector2 screenPosition, Colour textColour, Colour colour, Colour highlightColour, float scale, String body, PFont font) {
 		super(screenPosition, colour, scale);
 		
@@ -80,8 +90,14 @@ public abstract class Button extends UserInterface {
 		}
 	}
 	
+	/**
+	 * Executes every frame this button is hovered over
+	 */
 	protected void whileSelected() {}
 	
+	/**
+	 * Checks if the user's mouse pointer is hovering over this button
+	 */
 	protected boolean isMouseHovering() {
 		Vector2 mouse = new Vector2(this.getRenderer().mouseX, this.getRenderer().mouseY - 7);
 		Vector2 center = this.getCenter();
@@ -99,6 +115,9 @@ public abstract class Button extends UserInterface {
 		return false;
 	}
 	
+	/**
+	 * Checks if the user clicked on this button
+	 */
 	private boolean isBeingClicked() {
 		if (this.getRenderer().mousePressed) {
 			if (this.isMouseHovering()) {
@@ -115,6 +134,9 @@ public abstract class Button extends UserInterface {
 		return false;
 	}
 	
+	/**
+	 * Executes upon this being clicked
+	 */
 	public abstract void onClick();
 
 	protected void setWidth() {

@@ -10,6 +10,12 @@ public abstract class UserInterface extends RenderableObject {
 	
 	private float scale;
 	
+	/**
+	 * Represents an object that acts as part of the game's user interface
+	 * @param screenPosition The position to render this at
+	 * @param colour The colour it should be
+	 * @param scale How large this should be displayed
+	 */
 	public UserInterface(Vector2 screenPosition, Colour colour, float scale) {
 		this.setScreenPosition(screenPosition);
 		this.setColour(colour);

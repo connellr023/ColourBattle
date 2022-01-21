@@ -157,6 +157,9 @@ public class Game extends View {
 		}
 	}
 	
+	/**
+	 * Resets the list of client side game objects
+	 */
 	public static void reset() {
 		Game game = (Game) RenderingManager.getViews().get(2);
 		

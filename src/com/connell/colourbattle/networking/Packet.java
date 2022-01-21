@@ -6,6 +6,11 @@ public class Packet {
 	private String event;
 	private String data;
 	
+	/**
+	 * Represents data that can be sent between the client and server
+	 * @param event The name of the event
+	 * @param data The data to be sent
+	 */
 	public Packet(String event, String data) {
 		this.setEvent(event);
 		this.setData(data);
@@ -19,10 +24,17 @@ public class Packet {
 		this("", "");
 	}
 	
+	/**
+	 * Turns the packet into a string that can be sent
+	 */
 	public String encode() {
 		return event + SPLIT_CHAR + data;
 	}
 	
+	/**
+	 * Converts a packet string into a packet object
+	 * @param message The packet string to be decoded
+	 */
 	public static Packet decode(String message) {
 		String[] splitMessage = message.split("" + SPLIT_CHAR);
 

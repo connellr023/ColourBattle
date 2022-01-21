@@ -8,11 +8,18 @@ public abstract class RenderableObject {
 	
 	private RenderingManager renderer;
 	
+	/*
+	 * Represents an object that is able to be rendered on the client side
+	 */
 	public RenderableObject() {
 		this.setActive(true);
 		this.setRenderer(RenderingManager.getRenderer());
 	}
 	
+	/**
+	 * Executes every frame
+	 * Code relating to displaying this object goes here
+	 */
 	public abstract void render();
 
 	public boolean isActive() {

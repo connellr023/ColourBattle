@@ -17,6 +17,9 @@ public class ClientGameObject extends RenderableObject {
 		this.start();
 	}
 	
+	/**
+	 * Method to initialize socket client events for each game object that exist on the client side
+	 */
 	private void start() {
 		ClientSocketStream client = SocketClientManager.getClient();
 		

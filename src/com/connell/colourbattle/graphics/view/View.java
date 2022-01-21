@@ -11,26 +11,43 @@ import com.connell.colourbattle.utilities.*;
 import processing.core.PConstants;
 
 public abstract class View {
+	
+	/**
+	 * A list of pending client socket events to be registered after the client socket connection is established
+	 */
 	private static ConcurrentLinkedQueue<SocketEvent> pendingEvents = new ConcurrentLinkedQueue<SocketEvent>();
 	
+	/**
+	 * Initializes all of the various views in the game before it starts
+	 */
 	public static void registerViews() {
 		RenderingManager.addView(new Menu());
 		RenderingManager.addView(new WaitingRoom());
 		RenderingManager.addView(new Game());
 	}
 	
+	/**
+	 * Loads the views just as the game starts
+	 */
 	public static void loadViews() {
 		for (View v : RenderingManager.getViews()) {
 			v.start();
 		}
 	}
 	
+	/**
+	 * Loads the pending socket events after the client socket is ready
+	 */
 	public static void loadEvents() {
 		for (SocketEvent e : getPendingEvents()) {
 			SocketClientManager.getClient().listen(e);
 		}
 	}
 	
+	/**
+	 * Allows different view objects to add to the list of pending socket events
+	 * @param event The event to add
+	 */
 	public static void addClientSocketEvent(SocketEvent event) {
 		getPendingEvents().add(event);
 	}

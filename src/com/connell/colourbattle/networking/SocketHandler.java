@@ -15,21 +15,38 @@ public abstract class SocketHandler implements Runnable {
 	
 	private ConcurrentHashMap<String, SocketEvent> socketEvents;
 	
+	/**
+	 * Represents a socket object that is able to send and receive data
+	 */
 	public SocketHandler() {
 		this.setSocketEvents(new ConcurrentHashMap<String, SocketEvent>());
 		
 		this.start();
 	}
 	
+	/**
+	 * A method that can be used for initialization
+	 */
 	public abstract void start();
+	
+	/**
+	 * A method used to stop the socket
+	 */
 	public abstract void stop();
 	
+	/**
+	 * Used to register socket events to listen for on this socket
+	 * @param event The event to watch for
+	 */
 	public void listen(SocketEvent event) {
 		String eventName = event.getEvent();
 		
 		this.getSocketEvents().put(eventName, event);
 	}
 	
+	/**
+	 * Initializes the input and output stream for this socket
+	 */
 	protected void initIOStream() {
 		try {			
 			this.setOut(new PrintWriter(this.getClientSocket().getOutputStream(), true));
@@ -40,6 +57,10 @@ public abstract class SocketHandler implements Runnable {
 		}
 	}
 	
+	/**
+	 * Watches for incoming packets
+	 * @throws IOException If the input stream fails to read the socket
+	 */
 	public void handleDataReceival() throws IOException {
 		String recvData;
 		
@@ -54,8 +75,15 @@ public abstract class SocketHandler implements Runnable {
 		}
 	}
 	
+	/**
+	 * Method that is executed when a disconnect occurs
+	 */
 	public abstract void handleDisconnect();
 	
+	/**
+	 * Writes a message to the socket
+	 * @param message The message to send
+	 */
 	public void sendData(Packet message) {
 		try {
 			this.getOut().println(message.encode());

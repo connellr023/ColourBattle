@@ -4,6 +4,11 @@ public class SocketEvent {
 	private String event;
 	private Object object;
 	
+	/**
+	 * Represents a socket event with an associated callback method
+	 * @param event The event name
+	 * @param object A miscellaneous object that can be accessed within the callback method
+	 */
 	public SocketEvent(String event, Object object) {
 		this.setEvent(event);
 		this.setObject(object);

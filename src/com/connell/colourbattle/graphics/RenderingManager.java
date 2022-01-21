@@ -24,6 +24,11 @@ public class RenderingManager extends PApplet {
 	
 	public static boolean inDebugMode;
 	
+	/**
+	 * Initializes the rendering manager
+	 * @param frameRate Is the frame rate the game on the client side will run at
+	 * @param scale The amount to scale the game graphics
+	 */
 	public static void init(int frameRate, int scale) {
 		setViews(new LinkedList<View>());
 		setActiveViewIndex(0);
@@ -36,6 +41,10 @@ public class RenderingManager extends PApplet {
 		inDebugMode = false;
 	}
 	
+	/**
+	 * Starts the rendering manager
+	 * @param pArgs Are the arguments that are passed to processing
+	 */
 	public static void run(String[] pArgs) {
 		View.registerViews();
 		PApplet.runSketch(pArgs, getRenderer());
